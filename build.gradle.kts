@@ -24,6 +24,15 @@ dependencies {
 
     implementation("io.springfox:springfox-boot-starter:3.0.0")
 
+    implementation("org.springframework.boot:spring-boot-starter-freemarker")
+
+    implementation("org.webjars.bower:bootstrap:4.3.1")
+    implementation("org.webjars.bower:vue:2.5.16")
+    implementation("org.webjars.bower:axios:0.17.1")
+    implementation("org.webjars:sockjs-client:1.1.2")
+    implementation("org.webjars:sockjs-client:1.1.2")
+    implementation("org.webjars:stomp-websocket:2.3.3-1")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
