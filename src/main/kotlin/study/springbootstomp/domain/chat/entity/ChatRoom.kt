@@ -3,6 +3,6 @@ package study.springbootstomp.domain.chat.entity
 data class ChatRoom(
     val name: String
 ) {
-    val roomId: String
+    val id: String
         get() = name
 }

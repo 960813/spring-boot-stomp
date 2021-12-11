@@ -17,7 +17,7 @@
 <body>
 <div class="container" id="app" v-cloak>
     <div>
-        <h2>{{room.roomId}}</h2>
+        <h2>{{room.id}}</h2>
     </div>
     <div class="input-group">
         <div class="input-group-prepend">
@@ -30,7 +30,7 @@
     </div>
     <ul class="list-group">
         <li class="list-group-item" v-for="message in messages">
-            {{message.sender}} - {{message.message}}</a>
+            {{message.sender}} - {{message.message}} - {{new Date(message.createdAt)}}</a>
         </li>
     </ul>
     <div></div>
@@ -63,25 +63,27 @@
         },
         methods: {
             findRoom: function () {
-                axios.get('/chat/room/' + this.roomId).then(response => {
+                axios.get('/api/v1/chat/room/' + this.roomId).then(response => {
                     this.room = response.data;
                 });
             },
             sendMessage: function () {
-                ws.send("/pub/chat/message", {}, JSON.stringify({
+                ws.send("/pub/chat/room/" + this.roomId, {}, JSON.stringify({
                     type: 'COMMENT',
-                    roomId: this.roomId,
                     sender: this.sender,
                     message: this.message
                 }));
                 this.message = '';
             },
             recvMessage: function (recv) {
-                this.messages.unshift({
-                    "type": recv.type,
-                    "sender": recv.type === 'ENTER' ? '[알림]' : recv.sender,
-                    "message": recv.message
-                })
+                if (recv.type === 'COMMENT') {
+                    this.messages.unshift({
+                        "type": recv.type,
+                        "sender": recv.sender,
+                        "message": recv.message,
+                        "createdAt": recv.createdAt
+                    })
+                }
             }
         }
     });
@@ -93,9 +95,8 @@
                 var recv = JSON.parse(message.body);
                 vm.recvMessage(recv);
             });
-            ws.send("/pub/chat/message", {}, JSON.stringify({
+            ws.send("/pub/chat/room/" + vm.$data.roomId, {}, JSON.stringify({
                 type: 'ENTER',
-                roomId: vm.$data.roomId,
                 sender: vm.$data.sender,
                 message: ''
             }));

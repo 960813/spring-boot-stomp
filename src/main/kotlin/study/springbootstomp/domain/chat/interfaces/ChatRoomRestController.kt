@@ -1,28 +1,23 @@
 package study.springbootstomp.domain.chat.interfaces
 
 import org.springframework.http.MediaType
+import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
-import org.springframework.messaging.simp.SimpMessageSendingOperations
+import org.springframework.messaging.handler.annotation.SendTo
 import org.springframework.web.bind.annotation.*
 import study.springbootstomp.domain.chat.entity.ChatRoom
 import study.springbootstomp.domain.chat.service.ChatRoomService
-import study.springbootstomp.domain.chat.ws.dto.Chat
 
 
 @RestController
 class ChatRoomRestController(
-    private val sendingOperations: SimpMessageSendingOperations,
     private val chatRoomService: ChatRoomService
 ) {
 
-    @MessageMapping("/chat/message")
-    fun message(chat: Chat) {
-        val message: String = if (chat.type == Chat.Type.ENTER) {
-            "${chat.sender} 님이 입장했습니다."
-        } else {
-            chat.message
-        }
-        sendingOperations.convertAndSend("/sub/chat/room/${chat.roomId}", message)
+    @MessageMapping("/pub/chat/room/{roomId}")
+    @SendTo("/sub/chat/room/{roomId}")
+    fun message(@DestinationVariable roomId: String, dto: ChatDto): ChatDto {
+        return dto
     }
 
     @PostMapping(
@@ -43,7 +38,10 @@ class ChatRoomRestController(
         }
     }
 
-    @GetMapping("/room/{roomId}")
+    @GetMapping(
+        value = ["/api/v1/chat/room/{roomId}"],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
     fun roomInfo(
         @PathVariable roomId: String
     ): ChatRoom {

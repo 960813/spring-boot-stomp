@@ -20,7 +20,7 @@ class ChatRoomRepository {
         return ChatRoom(
             name = name
         ).also {
-            chatRooms[it.name] = it
+            chatRooms[it.id] = it
         }
     }
 }
