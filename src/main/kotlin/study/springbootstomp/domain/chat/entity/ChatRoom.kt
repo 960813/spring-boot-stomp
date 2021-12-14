@@ -4,5 +4,5 @@ data class ChatRoom(
     val name: String
 ) {
     val id: String
-        get() = name
+        get() = "room_$name"
 }
